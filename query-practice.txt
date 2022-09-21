@@ -1,0 +1,337 @@
+--DDL--
+----------------------------------------------------------------------------------------------------------------------
+--
+
+Question 1
+
+
+-- Question 2
+CREATE TABLE Department
+(
+  Deptno NUMERIC(2) PRIMARY KEY,
+  Deptname VARCHAR(20) UNIQUE,
+  Location VARCHAR(20)
+);
+
+
+-- Question 3
+CREATE TABLE Employee
+(
+
+    Empno NUMERIC(3) PRIMARY KEY,
+    ManagerID NUMERIC(3),
+    FirstName VARCHAR(20) NOT NULL,
+    LastName VARCHAR(20),
+    UserID VARCHAR(20),
+    Deptno NUMERIC(2)
+    CONSTRAINT fk_deptno 
+    FOREIGN KEY(Deptno)
+    REFERENCES Department(Deptno)
+    ON DELETE CASCADE,
+    Salary NUMERIC(7,2),
+    Commission NUMERIC(3),
+    JoiningDate DATE,
+    Designation VARCHAR(25)
+
+);
+
+-- Question 4,5,6
+
+    ALTER TABLE Employee 
+        ADD HRA NUMERIC(7,2);
+
+    ALTER TABLE Employee 
+        ADD PF NUMERIC(7,2)
+        CONSTRAINT chk_PF
+        CHECK(PF>0 AND PF<5000);
+--consider negative
+----------------------------------------------------------------------------------------------------------------------
+    
+-- Question 7
+
+-- Question 8
+CREATE TABLE Customer
+(
+
+    CustNo NUMERIC(2) PRIMARY KEY,
+    CustName VARCHAR(20),
+    CustomerAddress VARCHAR(40)
+
+);
+
+
+-- Question 9
+CREATE TABLE [Order]
+(
+
+    OrderNo NUMERIC(2) PRIMARY KEY,
+    CustNo VARCHAR(20) 
+        CONSTRAINT fk_custno 
+        FOREIGN KEY (CustNo) 
+        REFERENCES Customer(CustNo)
+        ON DELETE CASCADE,
+    OrderDate DATE
+
+);
+
+-- Question 10
+CREATE TABLE OrderItem
+(
+    ItemId NUMERIC(3) PRIMARY KEY,
+    OrderNo NUMERIC(2)  
+        CONSTRAINT fk_ordno 
+        FOREIGN KEY (OrderNo) 
+        REFERENCES [Order](OrderNo)
+        ON DELETE CASCADE,
+    ItemName VARCHAR(20),
+    Quantity NUMERIC(2),
+
+);
+
+--Question 11
+
+ALTER TABLE Customer
+ALTER COLUMN CustomerAddress VARCHAR(100);
+
+----------------------------------------------------------------------------------------------------------------------
+
+-- Question 12
+
+
+-- Question 13
+
+CREATE TABLE Course
+(
+
+    CourseId VARCHAR(5),
+    StreamId VARCHAR(20),
+    Title VARCHAR(40),
+    CourseDescription VARCHAR(200),
+    Fees DECIMAL,
+    PRIMARY KEY(CourseId)
+
+);
+
+-- Question 14
+
+CREATE TABLE Batch
+(
+
+    BatchId VARCHAR(30) PRIMARY KEY,
+    CourseId VARCHAR(5)
+        CONSTRAINT fk_courseid
+        FOREIGN KEY (CourseId)
+        REFERENCES Course(CourseId),
+    BatchName VARCHAR(1),
+);
+
+-- Question 15
+
+CREATE TABLE Student
+(
+
+    StudId VARCHAR(5) PRIMARY KEY,
+    LastName VARCHAR(25),
+    MiddleName VARCHAR(30),
+    FirstName VARCHAR(20),
+    Dob DATE DEFAULT GETDATE(),
+    BatchId VARCHAR(5)
+        CONSTRAINT fk_batchid
+        FOREIGN KEY (BatchId)
+        REFERENCES Batch(BatchId),
+
+    StudentAddress VARCHAR(50),
+    City VARCHAR(20),
+    StudentState VARCHAR(2),
+    Zipcode VARCHAR(9),
+    Telephone VARCHAR(10),
+    Fax VARCHAR(10),
+    Email VARCHAR(30),
+    Grade VARCHAR(1)
+        CONSTRAINT chk_grade
+        CHECK(Grade IN('A','A+','A-',
+                       'B','B+','B-',
+                       'C','C+','C-',
+                       'D','D+','D-',
+                       'F','F+','F-')),
+);
+
+
+-- Question 16
+
+ALTER TABLE Student DROP MiddleName;
+
+-- Question 17
+
+EXEC sp_rename 'Student','Participant';
+
+----------------------------------------------------------------------------------------------------------------------
+
+--DML --
+
+----------------------------------------------------------------------------------------------------------------------
+
+USE DemoNissan
+
+-- 4 D Insert atleast 3 records in all the eight tables
+
+INSERT INTO Department
+VALUES (10,'Accounts','Trivandrum'),
+	   (11,'Admin','Delhi'),
+	   (12,'Sales','Mumbai')
+
+SELECT * FROM Department;
+
+INSERT INTO Employee
+VALUES (198,124,'Donald','OConnell','DOCONNEL',10,2600,200,'1998-09-13','SH_CLERK',2200,824),
+	   (199,125,'Shelby','Tommy','SHTOMM',11,1600,500,'2000-06-12','SH_PROG',1200,824),
+	   (200,126,'Martha','Wayne','MAWAY',12,5600,300,'1997-01-01','SH_HR',3200,824),
+	   (201,127,'Chris','Nolan','CHNOL',10,2600,150,'1999-05-22','SH_CLERK',1200,824),
+
+
+
+
+
+SELECT * FROM Employee;
+
+
+
+INSERT INTO Customer
+	VALUES(21,'Jhon','Trivandrum'),
+		  (22,'Deb','Tamil Nadu'),
+		  (23,'Sat','Mumbai'),
+		  (24,'Niy','New Delhi')
+	
+SELECT * FROM Customer;
+
+	
+INSERT INTO [Order]
+	VALUES (43,21,GETDATE()),
+		   (44,24,GETDATE()),
+		   (45,23,GETDATE()),
+		   (46,22,GETDATE())
+
+SELECT * FROM [Order];
+
+INSERT INTO OrderItem
+	VALUES (51,43,'Boots',23),
+		   (52,44,'Watch',12),
+		   (53,45,'Modem',2),
+		   (54,46,'RJ Cables',30)
+
+SELECT * FROM OrderItem;
+
+
+INSERT INTO Course
+	VALUES ('CS101','CS01','C++','Intro to C++',600.0),
+		   ('CS102','CS02','Python','Intro to Python',500.0),
+		   ('CS103','CS03','Java','Intro to Java',300.0),
+		   ('CS104','CS04','C#','Intro to C#',200.0)
+
+SELECT * FROM Course;
+
+INSERT INTO Batch
+	VALUES (10,'CS101','A'),
+		   (11,'CS104','B'),
+		   (12,'CS102','C')
+
+SELECT * FROM Batch;
+
+
+INSERT INTO Participant
+	VALUES ('1','SW','SAF','1998-09-01',10,'XYZ','TVM','KR','670','454545','','SAF@','A'),
+		  ('2','SX','RAF','1999-07-22',12,'ABC','TMD','TD','370','562378','','RAF@','A'),
+		  ('3','SE','DSF','1998-12-11',12,'ASD','ND','ND','870','123456','','DSF@','C'),
+		  ('4','ST','REF','1997-03-15',11,'QWE','KA','HY','560','0909090','','REF@','B'),
+		  ('5','SG','QWF','2000-06-01',11,'YUI','BNG','HS','470','87834780','','QWF@','F'),
+		  ('6','SAG','QRT','2000-06-30',10,'HU','GA','GH','343434','84340','','','F')
+SELECT * FROM Participant;
+
+-- 5 E Remove the record of a customer form the customer table
+
+DELETE FROM Customer
+	WHERE Custno = 21;
+
+SELECT * FROM Customer;
+
+-- 6 F Insert only empno, name into Employee table.
+
+
+INSERT INTO Employee(Empno,FirstName,LastName)
+	VALUES (210,'Thomas','Butch')
+SELECT * FROM Employee;
+
+-- 7 G Change address of a particular customer to �New Delhi�
+
+UPDATE Customer 
+	SET CustomerAddress = 'New Delhi'
+	WHERE CustNo = 22;
+
+SELECT * FROM Customer;
+
+-- 8 H Remove details of employees working in a particular department and whose salary is greater than 5000.
+
+DELETE FROM Employee
+	WHERE Deptno=12  AND Salary > 5000;
+SELECT * FROM Employee;
+
+-- 9 I Change deptno and name of a particular employee
+
+UPDATE Employee 
+	SET Deptno = 12
+	WHERE Empno = 210
+
+SELECT * FROM Employee;
+
+-- 10 J Change the email of the student in Student table who does not have a email to �NA�.
+
+UPDATE Participant
+	SET Email = 'NA'
+	WHERE Email = null OR  Email = ''
+
+SELECT * FROM Participant;
+
+-- 11 K Remove students whose age is greater than 20.
+
+DELETE FROM  Participant
+	WHERE YEAR(GETDATE())-YEAR(Dob) > 20;
+
+-- 12 L Remove students who do not have telephone and email.
+
+DELETE FROM  Participant
+	WHERE (Telephone = null OR Telephone = '') AND (Email = null OR Email = '');
+
+
+-- 13 M Remove students whose birthday falls on 5th June.
+
+DELETE FROM  Participant
+	WHERE MONTH(Dob) = 6 AND DAY(Dob) = 5;
+
+-- 14 N Change students firstname to XXX, dob to current date whose first name contains �A� in the fourth position.
+
+UPDATE Participant
+	SET FirstName = 'XXX',
+	Dob = GETDATE()
+	WHERE FirstName LIKE '____A%'
+
+-- 15 O Remove students whose state ends with letter �a�.
+
+DELETE FROM Participant
+	WHERE StudentState LIKE '%a'
+
+-- 16 P Change student�s lastname to Jan whose birthday falls on January
+	
+UPDATE Participant
+	SET LastName = 'Jan'
+	WHERE MONTH(Dob) = 1;	
+
+-- 17. Remove students whose state starts with T.
+DELETE FROM Participant
+	WHERE StudentState LIKE 'T%'
+
+-- END
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+
